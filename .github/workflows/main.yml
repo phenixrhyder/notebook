@@ -15,10 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Step 1: Check out the repository's code so the workflow can access it.
+      # THE FIX IS HERE: fetch-depth: 1 tells the action to only get the
+      # most recent commit, ignoring all the old history with the video file.
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1 # This is the crucial change
           lfs: true
 
       # Step 2: Push all the files from your GitHub repository to your Hugging Face Space.
@@ -28,7 +30,6 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           # This command adds your Hugging Face Space as a new remote destination.
-          # UPDATED to point to your new Checkerboard_Pattern space.
           git remote add space https://user:${HF_TOKEN}@huggingface.co/spaces/phenixrhyder/Checkerboard_Pattern
           
           # This command force-pushes the 'main' branch of your GitHub repo to the 'main' branch of the Space.
