@@ -15,20 +15,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Step 1: Check out the repository's code so the workflow can access it.
-      # fetch-depth: 0 is important for the Hugging Face action to work correctly.
+      # We add `lfs: true` to handle any large files if you add them later.
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          lfs: true
 
       # Step 2: Push all the files from your GitHub repository to your Hugging Face Space.
+      # This uses a direct git push command instead of the hub-action.
       - name: Push to Hugging Face Hub
-        # CORRECTED: The version of the action is now v0 instead of v1
-        uses: huggingface/hub-action@v0
-        with:
-          # Your Hugging Face username and the name of your Space
-          repo_id: "phenixrhyder/phenixrhyder"
-          # The type of repository on the Hub
-          repo_type: "space"
-          # Your Hugging Face token, stored as a secret in your GitHub repository settings
-          token: ${{ secrets.HF_TOKEN }}
+        env:
+          # Your Hugging Face token, stored as a secret
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git remote add space https://user:${HF_TOKEN}@huggingface.co/spaces/phenixrhyder/phenixrhyder
+          git push --force space main
