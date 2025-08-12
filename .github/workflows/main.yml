@@ -1,4 +1,4 @@
-# PhenixRhyder/ Playlist grid maker and checkerboard pattern
+# PhenixRhyder/ Checkerboard Grid 
 name: Deploy React App to Hugging Face Spaces
 
 # This action will trigger on every push to the 'main' branch
@@ -32,14 +32,24 @@ jobs:
       - name: Build application
         run: npm run build
 
-      # 5. Upload the 'build' folder to your Hugging Face Space
+      # 5. Push the 'build' folder to your Hugging Face Space
       - name: Push to Hugging Face Hub
-        uses: huggingface/huggingface-hub@v0.23.0
-        with:
-          # IMPORTANT: Replace with your Hugging Face username and Space name
-          repo_id: "YourHuggingFaceUsername/YourSpaceName"
-          repo_type: space
+        env:
           # This uses the secret token you created
-          token: ${{ secrets.HF_TOKEN }}
-          # This is the folder that gets created by 'npm run build'
-          folder_path: build
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          # Clone the Hugging Face Space repository into a 'hf-space' directory
+          # We only clone the .git history, not the files, for speed
+          git clone --bare https://huggingface.co/phenixrhyder:${HF_TOKEN}@https://huggingface.co/phenixrhyder/spaces#repos.hf-space
+
+          # Use rsync to efficiently copy the built app into the space repo
+          # This deletes old files from the destination to keep it clean
+          rsync -a --delete --exclude=".git" build/ .hf-space/
+
+          # Go into the space directory, commit, and push the changes
+          cd .hf-space
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Deploy from GitHub Actions" || echo "No changes to commit"
+          git push https://huggingface.co/phenixrhyder:${HF_TOKEN}@https://huggingface.co/phenixrhyder/spaces#repos
