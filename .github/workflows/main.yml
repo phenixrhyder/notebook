@@ -1,6 +1,5 @@
-# PhenixRhyder/ Checkerboard 
-# Name of your workflow
-name: Deploy React App to Hugging Face Spaces
+# Phenix Rhyder/ Checkerboard Pattern
+name: Deploy Python App to Hugging Face Spaces
 
 # This action will trigger on every push to the 'main' branch
 on:
@@ -8,52 +7,28 @@ on:
     branches:
       - main # Or 'master' depending on your repository's default branch
 
-# Jobs to be executed
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  build-and-deploy:
+  # This job syncs your repository content to a Hugging Face Space
+  deploy-to-hub:
     # Use the latest version of Ubuntu as the operating system
     runs-on: ubuntu-latest
-
     steps:
-      # 1. Check out your repository code so the workflow can access it
-      - name: Checkout code
+      # Step 1: Check out the repository's code so the workflow can access it.
+      # fetch-depth: 0 is important for the Hugging Face action to work correctly.
+      - name: Checkout repository
         uses: actions/checkout@v4
-
-      # 2. Set up Node.js, which is required to build a React app
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          fetch-depth: 0
 
-      # 3. Install the project dependencies (like React)
-      - name: Install dependencies
-        # Corrected the working directory to be lowercase 'notebook'
-        working-directory: ./notebook
-        run: npm install
-
-      # 4. Build the React application for production
-      - name: Build application
-        # Corrected the working directory to be lowercase 'notebook'
-        working-directory: ./notebook
-        run: npm run build
-
-      # 5. Upload the 'build' folder to your Hugging Face Space using the official library
+      # Step 2: Push all the files from your GitHub repository to your Hugging Face Space.
+      # This action handles the syncing process for you.
       - name: Push to Hugging Face Hub
-        env:
-          # This uses the secret token you created
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: |
-          # Install the huggingface_hub library
-          pip install huggingface-hub
-
-          # Run a Python script to upload the folder
-          python -c "
-          from huggingface_hub import HfApi
-          api = HfApi(token='$HF_TOKEN')
-          api.upload_folder(
-              # Corrected the path to the 'build' folder
-              folder_path='notebook/build',
-              repo_id='phenixrhyder/phenixrhyder',
-              repo_type='space'
-          )
-          "
+        uses: huggingface/hub-action@v1
+        with:
+          # Your Hugging Face username and the name of your Space
+          repo_id: "phenixrhyder/phenixrhyder"
+          # The type of repository on the Hub
+          repo_type: "space"
+          # Your Hugging Face token, stored as a secret in your GitHub repository settings
+          token: ${{ secrets.HF_TOKEN }}
