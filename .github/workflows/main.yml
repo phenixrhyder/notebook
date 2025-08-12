@@ -1,33 +1,40 @@
-# Phenix Rhyder/ Checkerboard Pattern
+# Phenix Rhyder/ 
 name: Deploy Python App to Hugging Face Spaces
 
-# This action will trigger on every push to the 'main' branch
 on:
   push:
     branches:
       - main
 
-# A workflow run is made up of one or more jobs
 jobs:
-  # This job syncs your repository content to a Hugging Face Space
   deploy-to-hub:
-    # Use the latest version of Ubuntu as the operating system
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Check out the repository's code so the workflow can access it.
-      # We add `lfs: true` to handle any large files if you add them later.
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           lfs: true
 
-      # Step 2: Push all the files from your GitHub repository to your Hugging Face Space.
-      # This uses a direct git push command instead of the hub-action.
-      - name: Push to Hugging Face Hub
+      # NEW DIAGNOSTIC STEP
+      # This step will try to use the token to log in and print your username.
+      - name: Test Hugging Face Token
         env:
-          # Your Hugging Face token, stored as a secret
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git remote add space https://user:TOKEN@huggingface.co/spaces/phenixrhyder/phenixrhyder
+          # Install the huggingface command-line tool
+          pip install -U "huggingface_hub[cli]"
+          
+          # Use the token to log in and ask "who am I?"
+          # If this command fails, the token is definitely invalid.
+          echo "--- Testing the token now ---"
+          huggingface-cli whoami
+          echo "--- Test complete ---"
+
+      # This is the original push command. It will run after the test.
+      - name: Push to Hugging Face Hub
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git remote add space https://user:${HF_TOKEN}@huggingface.co/spaces/phenixrhyder/phenixrhyder
           git push --force space main
