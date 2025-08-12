@@ -15,12 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Step 1: Check out the repository's code so the workflow can access it.
-      # THE FIX IS HERE: fetch-depth: 1 tells the action to only get the
-      # most recent commit, ignoring all the old history with the video file.
+      # We are now fetching the full history because it is clean.
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1 # This is the crucial change
+          fetch-depth: 0 # Using 0 fetches all history, which is correct now.
           lfs: true
 
       # Step 2: Push all the files from your GitHub repository to your Hugging Face Space.
