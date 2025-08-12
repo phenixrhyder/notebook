@@ -26,10 +26,14 @@ jobs:
 
       # 3. Install the project dependencies (like React)
       - name: Install dependencies
+        # Run commands inside the 'notebook' subfolder
+        working-directory: ./notebook
         run: npm install
 
       # 4. Build the React application for production
       - name: Build application
+        # Run the build command inside the 'notebook' subfolder
+        working-directory: ./notebook
         run: npm run build
 
       # 5. Upload the 'build' folder to your Hugging Face Space using the official library
@@ -46,8 +50,9 @@ jobs:
           from huggingface_hub import HfApi
           api = HfApi(token='$HF_TOKEN')
           api.upload_folder(
-              folder_path='build',
-              repo_id='PhenixRhyder/ phenixrhyder',
+              # Point to the 'build' folder inside the 'notebook' subfolder
+              folder_path='notebook/build',
+              repo_id='PhenixRhyder/ checkerboard pattern',
               repo_type='space'
           )
           "
