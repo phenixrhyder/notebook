@@ -29,5 +29,5 @@ jobs:
           # Your Hugging Face token, stored as a secret
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git remote add space https://user:${HF_TOKEN}@huggingface.co/spaces/phenixrhyder/phenixrhyder
+          git remote add space https://user:${HF_TOKEN}https://huggingface.co/phenixrhyder
           git push --force space main
