@@ -1,0 +1,45 @@
+# PhenixRhyder/ Playlist grid maker and checkerboard pattern
+name: Deploy React App to Hugging Face Spaces
+
+# This action will trigger on every push to the 'main' branch
+on:
+  push:
+    branches:
+      - main # Or 'master' depending on your repository's default branch
+
+# Jobs to be executed
+jobs:
+  build-and-deploy:
+    # Use the latest version of Ubuntu as the operating system
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out your repository code so the workflow can access it
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Set up Node.js, which is required to build a React app
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Use a recent stable version of Node.js
+
+      # 3. Install the project dependencies (like React)
+      - name: Install dependencies
+        run: npm install
+
+      # 4. Build the React application for production
+      - name: Build application
+        run: npm run build
+
+      # 5. Upload the 'build' folder to your Hugging Face Space
+      - name: Push to Hugging Face Hub
+        uses: huggingface/huggingface-hub@v0.23.0
+        with:
+          # IMPORTANT: Replace with your Hugging Face username and Space name
+          repo_id: "YourHuggingFaceUsername/YourSpaceName"
+          repo_type: space
+          # This uses the secret token you created
+          token: ${{ secrets.HF_TOKEN }}
+          # This is the folder that gets created by 'npm run build'
+          folder_path: build
