@@ -1,4 +1,4 @@
-# Phenix Rhyder/ Checkerboard pattern
+# Phenix Rhyder/ Checkerboard Pattern
 name: Deploy Python App to Hugging Face Spaces
 
 # This action will trigger on every push to the 'main' branch
@@ -23,9 +23,10 @@ jobs:
 
       # Step 2: Push all the files from your GitHub repository to your Hugging Face Space.
       - name: Push to Hugging Face Hub
-        uses: huggingface/hub-action@v1
+        # CORRECTED: The version of the action is now v0 instead of v1
+        uses: huggingface/hub-action@v0
         with:
-          # phenixrhyder/ phenixrhyder
+          # Your Hugging Face username and the name of your Space
           repo_id: "phenixrhyder/phenixrhyder"
           # The type of repository on the Hub
           repo_type: "space"
