@@ -1,4 +1,5 @@
 # PhenixRhyder/ Checkerboard 
+# Name of your workflow
 name: Deploy React App to Hugging Face Spaces
 
 # This action will trigger on every push to the 'main' branch
@@ -26,14 +27,14 @@ jobs:
 
       # 3. Install the project dependencies (like React)
       - name: Install dependencies
-        # Use the correct folder name with a capital 'N'
-        working-directory: ./Notebook
+        # Corrected the working directory to be lowercase 'notebook'
+        working-directory: ./notebook
         run: npm install
 
       # 4. Build the React application for production
       - name: Build application
-        # Use the correct folder name with a capital 'N'
-        working-directory: ./Notebook
+        # Corrected the working directory to be lowercase 'notebook'
+        working-directory: ./notebook
         run: npm run build
 
       # 5. Upload the 'build' folder to your Hugging Face Space using the official library
@@ -50,9 +51,9 @@ jobs:
           from huggingface_hub import HfApi
           api = HfApi(token='$HF_TOKEN')
           api.upload_folder(
-              # Point to the 'build' folder inside the 'Notebook' subfolder
-              folder_path='Notebook/build',
-              repo_id='phenixrhyder/ phenixrhyder',
+              # Corrected the path to the 'build' folder
+              folder_path='notebook/build',
+              repo_id='phenixrhyder/phenixrhyder',
               repo_type='space'
           )
           "
