@@ -1,4 +1,4 @@
-# PhenixRhyder/ Checkerboard Grid 
+# PhenixRhyder/ Checkerboard Pattern
 name: Deploy React App to Hugging Face Spaces
 
 # This action will trigger on every push to the 'main' branch
@@ -22,7 +22,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # Use a recent stable version of Node.js
+          node-version: '18'
 
       # 3. Install the project dependencies (like React)
       - name: Install dependencies
@@ -32,24 +32,22 @@ jobs:
       - name: Build application
         run: npm run build
 
-      # 5. Push the 'build' folder to your Hugging Face Space
+      # 5. Upload the 'build' folder to your Hugging Face Space using the official library
       - name: Push to Hugging Face Hub
         env:
           # This uses the secret token you created
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          # Clone the Hugging Face Space repository into a 'hf-space' directory
-          # We only clone the .git history, not the files, for speed
-          git clone --bare https://huggingface.co/phenixrhyder:${HF_TOKEN}@https://huggingface.co/phenixrhyder/spaces#repos.hf-space
+          # Install the huggingface_hub library
+          pip install huggingface-hub
 
-          # Use rsync to efficiently copy the built app into the space repo
-          # This deletes old files from the destination to keep it clean
-          rsync -a --delete --exclude=".git" build/ .hf-space/
-
-          # Go into the space directory, commit, and push the changes
-          cd .hf-space
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add .
-          git commit -m "Deploy from GitHub Actions" || echo "No changes to commit"
-          git push https://huggingface.co/phenixrhyder:${HF_TOKEN}@https://huggingface.co/phenixrhyder/spaces#repos
+          # Run a Python script to upload the folder
+          python -c "
+          from huggingface_hub import HfApi
+          api = HfApi(token='$HF_TOKEN')
+          api.upload_folder(
+              folder_path='build',
+              repo_id='PhenixRhyder/ phenixrhyder',
+              repo_type='space'
+          )
+          "
