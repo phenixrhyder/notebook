@@ -1,4 +1,4 @@
-# PhenixRhyder/ Checkerboard Pattern
+# PhenixRhyder/ Checkerboard 
 name: Deploy React App to Hugging Face Spaces
 
 # This action will trigger on every push to the 'main' branch
@@ -18,29 +18,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Diagnostic Step: List all files to find package.json
-      - name: List files in repository
-        run: ls -R
-
-      # 3. Set up Node.js, which is required to build a React app
+      # 2. Set up Node.js, which is required to build a React app
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
-      # 4. Install the project dependencies (like React)
+      # 3. Install the project dependencies (like React)
       - name: Install dependencies
-        # This tells the Action to run the command inside the 'notebook' folder
-        working-directory: ./notebook
+        # Use the correct folder name with a capital 'N'
+        working-directory: ./Notebook
         run: npm install
 
-      # 5. Build the React application for production
+      # 4. Build the React application for production
       - name: Build application
-        # This also runs inside the 'notebook' folder
-        working-directory: ./notebook
+        # Use the correct folder name with a capital 'N'
+        working-directory: ./Notebook
         run: npm run build
 
-      # 6. Upload the 'build' folder to your Hugging Face Space using the official library
+      # 5. Upload the 'build' folder to your Hugging Face Space using the official library
       - name: Push to Hugging Face Hub
         env:
           # This uses the secret token you created
@@ -54,8 +50,8 @@ jobs:
           from huggingface_hub import HfApi
           api = HfApi(token='$HF_TOKEN')
           api.upload_folder(
-              # Point to the 'build' folder that was created inside the 'notebook' subfolder
-              folder_path='notebook/build',
+              # Point to the 'build' folder inside the 'Notebook' subfolder
+              folder_path='Notebook/build',
               repo_id='phenixrhyder/ phenixrhyder',
               repo_type='space'
           )
